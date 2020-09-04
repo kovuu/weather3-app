@@ -9,9 +9,10 @@
 
   background: rgb(0,0,0);
   background: linear-gradient(180deg, rgba(0,0,0,1) 0%, rgba(8,7,42,1));
-  color: white;
+  color: #d4ecea;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   margin: 1px;
+
 
 }
 
@@ -20,10 +21,80 @@
 }
 
 .wrap {
-  width: 370px;
+  width: 100%;
   margin: 0 auto;
+  text-align: center;
 }
 
 button {
   display: inline;
+}
+
+.first-block {
+  border: 1px solid black;
+  width: 50%;
+  margin: 1.5rem auto;
+  border-radius: 10px;
+  color: #d4ecea;
+  position: relative;
+  background: rgb(0,0,0);
+  background: linear-gradient(180deg, rgba(117, 217, 252,1) 0%, rgb(0, 60, 128));
+  font-size: 2rem;
+  height: 200px;
+  min-width: 350px;
+}
+
+.night {
+  background: linear-gradient(180deg, rgba(0,0,0,1) 0%, rgba(8,7,42,1));
+}
+
+.day {
+  background: linear-gradient(180deg, rgba(117, 217, 252,1) 0%, rgb(0, 60, 128));
+}
+/*background: linear-gradient(180deg, rgba(0,0,0,1) 0%, rgba(8,7,42,1));*/
+/*  background: linear-gradient(180deg, rgb(236, 187, 63) 0%, rgb(248, 243, 23));
+*/
+
+.first-block img {
+  position: absolute;
+  left: .5rem;
+  top: .5rem;
+  width: 8rem;
+}
+
+.first-block .time {
+  position: absolute;
+  right: 1.5rem;
+  top: 1rem;
+  font-size: 1.5rem;
+}
+
+.first-block .city {
+  position: absolute;
+  left: 3rem;
+  bottom: .5rem;
+  font-size: 1rem;
+}
+
+.first-block .temp {
+  position: absolute;
+  top: 7rem;
+  left: 43%;
+}
+.first-block .weather {
+  position: absolute;
+  left: 43%;
+  top: 3rem;
+}
+
+.first-block .date {
+  position: absolute;
+  right: 1rem;
+  bottom: .5rem;
+  font-size: 1rem;
+}
+
+.btn-enabled {
+  background-color: #007bff !important;
+  color: white;
 }

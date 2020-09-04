@@ -3,8 +3,10 @@
 // The list of file replacements can be found in `angular.json`.
 
 export const environment = {
-  apiKey: 'b99e8b33a3a9143a021f2c0878d5e15d',
-  serviceUrl: 'https://api.openweathermap.org/data/2.5/onecall?',
+  apiKey: '05b4282be099cfd73e7c86861370e3d8',
+  serviceUrl: 'https://api.openweathermap.org/data/2.5/',
+  serviceOneCallUrl: 'onecall',
+  serviceForecastUrl: 'forecast',
   KRASNODAR: ['45.0328', '38.9769'],
   TAGANROG: ['47.2362', '38.8969'],
   MOSCOW: ['55.7522', '37.6156'],
