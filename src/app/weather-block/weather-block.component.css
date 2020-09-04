@@ -1,0 +1,29 @@
+.container {
+  text-align: center;
+}
+
+.weather-block {
+  text-align: center;
+  display:block;
+  border-radius: 10px;
+
+  background: rgb(0,0,0);
+  background: linear-gradient(180deg, rgba(0,0,0,1) 0%, rgba(8,7,42,1));
+  color: white;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  margin: 1px;
+
+}
+
+.weather-block p {
+  font-size: 1rem;
+}
+
+.wrap {
+  width: 370px;
+  margin: 0 auto;
+}
+
+button {
+  display: inline;
+}

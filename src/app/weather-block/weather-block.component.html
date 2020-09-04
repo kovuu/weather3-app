@@ -1,0 +1,25 @@
+<div class="container">
+  <h1>Weather-App!</h1>
+  <div class="mt-4" >
+    <button class="btn btn-outline-primary m-2" (click)="chooseForecastMode(ForecastMode.ONE_DAY)">One Day</button>
+    <button class="btn btn-outline-primary m-2" (click)="chooseForecastMode(ForecastMode.THREE_DAYS)">Three days</button>
+    <button class="btn btn-outline-primary m-2" (click)="chooseForecastMode(ForecastMode.WEEK)">Week</button>
+  </div>
+    <div class="mt-4 d-flex align-content-stretch flex-wrap wrap" >
+      <div class="p-2  h-auto weather-block " *ngFor="let day of OutputWeatherData">
+        <p>{{day.date | date:'H:mm'}}</p>
+          <img src="http://openweathermap.org/img/wn/{{day.icon}}@2x.png">
+          <p>{{day.temp}}℃</p>
+          <p>{{day.weather}}</p>
+        </div>
+
+
+  </div>
+
+  <div class="mt-4" >
+  <span *ngFor="let city of citiesList | keyvalue">
+    <button class="btn btn-outline-primary m-2" (click)="changeCity(city.value)">{{city.key}}</button>
+  </span>
+  </div>
+</div>
+
