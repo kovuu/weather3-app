@@ -5,8 +5,9 @@
 export const environment = {
   apiKey: '05b4282be099cfd73e7c86861370e3d8',
   serviceUrl: 'https://api.openweathermap.org/data/2.5/',
-  serviceOneCallUrl: 'onecall',
-  serviceForecastUrl: 'forecast',
+  oneCallApi: 'onecall',
+  currentWeatherApi: 'weather',
+  forecastApi: 'forecast',
   KRASNODAR: ['45.0328', '38.9769'],
   TAGANROG: ['47.2362', '38.8969'],
   MOSCOW: ['55.7522', '37.6156'],

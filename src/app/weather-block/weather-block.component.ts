@@ -13,6 +13,7 @@ enum ForecastMode {
 export class WeatherBlockComponent implements OnInit {
 
   private WeatherData: any;
+  CurrentWeatherData;
   OutputWeatherData = [];
   currentCity: string ;
   citiesList = new Map();
@@ -38,19 +39,39 @@ export class WeatherBlockComponent implements OnInit {
     this.citiesList.set('Madrid', environment.MADRID);
     this.citiesList.set('Moscow', environment.MOSCOW);
     this.currentCity = 'Taganrog';
+    this.getCurrentWeather();
     this.getForecastForMode(this.forecastMode);
   }
   // tslint:disable-next-line:typedef
   getWeatherData() {
     let url: string;
     // tslint:disable-next-line:triple-equals
-    const typeOfCall = this.forecastMode === ForecastMode.THREE_DAYS ? environment.serviceForecastUrl : environment.serviceOneCallUrl;
+    const typeOfCall = this.forecastMode === ForecastMode.THREE_DAYS ? environment.forecastApi : environment.oneCallApi;
     url = `${environment.serviceUrl}${typeOfCall}?lat=${this.citiesList.get(this.currentCity)[0]}&lon=${this.citiesList.get(this.currentCity)[1]}&appid=${environment.apiKey}&units=metric`;
     fetch(url)
       .then(response => response.json())
-      .then(data => this.setWeatherData(data));
-    console.log(22);
+      .then(data => this.setWeatherData(data))
+      .then(() => this.getForecast(this.forecastMode));
   }
+
+  getCurrentWeather() {
+    let url = `${environment.serviceUrl}${environment.currentWeatherApi}?lat=${this.citiesList.get(this.currentCity)[0]}&lon=${this.citiesList.get(this.currentCity)[1]}&appid=${environment.apiKey}&units=metric`;
+    fetch(url)
+      .then(response => response.json())
+      .then(data => this.setCurrentWeatherData(data));
+  }
+
+  setCurrentWeatherData(data) {
+    this.CurrentWeatherData = {};
+    this.CurrentWeatherData = {
+      temp: data.main.temp.toFixed(0),
+      weather: data.weather[0].main,
+      icon: data.weather[0].icon,
+      date: Date.now(),
+      city: data.name,
+    };
+}
+
 
   // tslint:disable-next-line:typedef
   setWeatherData(data) {
@@ -104,14 +125,15 @@ export class WeatherBlockComponent implements OnInit {
     const currWeatherData = hourly ? this.WeatherData.hourly : this.forecastMode === ForecastMode.WEEK
                   ? this.WeatherData.daily : this.WeatherData.list;
     let temp;
-    let temp_night;
+    // tslint:disable-next-line:variable-name
+    let tempNight;
     for (const day of  currWeatherData) {
       temp = hourly ? day.temp.toFixed(0) : this.forecastMode === ForecastMode.WEEK
                                 ? day.temp.day.toFixed(0) : day.main.temp.toFixed(0);
-      temp_night = this.forecastMode === ForecastMode.WEEK ? day.temp.night.toFixed(0) : null;
+      tempNight = this.forecastMode === ForecastMode.WEEK ? day.temp.night.toFixed(0) : null;
       const obj = {
         temp,
-        temp_night,
+        tempNight,
         date: day.dt * 1000,
         icon: day.weather[0].icon,
         weather: day.weather[0].main,
@@ -128,6 +150,7 @@ export class WeatherBlockComponent implements OnInit {
   changeCity(city) {
     this.currentCity = city;
     this.cityIsChanged = true;
+    this.getCurrentWeather();
     this.getForecastForMode(this.forecastMode);
     this.cityIsChanged = false;
 
@@ -148,11 +171,7 @@ export class WeatherBlockComponent implements OnInit {
   getForecastForMode(mode) {
     this.forecastMode = mode;
     // tslint:disable-next-line:max-line-length
-    if (this.WeatherData.flag || this.cityIsChanged || this.WeatherData.hourly && this.forecastMode === ForecastMode.THREE_DAYS || (this.WeatherData.list && this.forecastMode !== ForecastMode.THREE_DAYS)) {
-      this.getWeatherData();
-    }
-    setTimeout(() => this.getForecast(this.forecastMode), 1000);
-
-}
+    this.getWeatherData();
+  }
 }
 
