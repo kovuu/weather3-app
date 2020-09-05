@@ -12,14 +12,13 @@ enum ForecastMode {
 })
 export class WeatherBlockComponent implements OnInit {
   private WeatherData: any;
-  CurrentWeatherData;
-  OutputWeatherData = [];
+  CurrentWeatherData: any;
+  OutputWeatherData: any = [];
   currentCity: string ;
-  citiesList = new Map();
+  citiesMap = new Map();
   forecastMode: ForecastMode = ForecastMode.ONE_DAY;
-  // tslint:disable-next-line:typedef
-  ForecastMode = ForecastMode;
-  typeOfCallsMap = new Map();
+  ForecastMode: any = ForecastMode;
+  private typeOfCallsMap = new Map();
 
   constructor() {}
 
@@ -36,13 +35,13 @@ export class WeatherBlockComponent implements OnInit {
     this.typeOfCallsMap.set(this.ForecastMode.WEEK, environment.oneCallApi);
     this.typeOfCallsMap.set(this.ForecastMode.CURRENT, environment.currentWeatherApi);
 
-    this.citiesList.set('Krasnodar', environment.KRASNODAR);
-    this.citiesList.set('Taganrog', environment.TAGANROG);
-    this.citiesList.set('Murmansk', environment.MURMANSK);
-    this.citiesList.set('Vladivostok', environment.VLADIVOSTOK);
-    this.citiesList.set('NewYork', environment.NEW_YORK);
-    this.citiesList.set('Madrid', environment.MADRID);
-    this.citiesList.set('Moscow', environment.MOSCOW);
+    this.citiesMap.set('Krasnodar', environment.KRASNODAR);
+    this.citiesMap.set('Taganrog', environment.TAGANROG);
+    this.citiesMap.set('Murmansk', environment.MURMANSK);
+    this.citiesMap.set('Vladivostok', environment.VLADIVOSTOK);
+    this.citiesMap.set('NewYork', environment.NEW_YORK);
+    this.citiesMap.set('Madrid', environment.MADRID);
+    this.citiesMap.set('Moscow', environment.MOSCOW);
     this.currentCity = 'Taganrog';
     this.updateWeatherData(this.typeOfCallsMap.get(this.ForecastMode.CURRENT));
     this.getForecastForMode(this.forecastMode);
@@ -51,7 +50,7 @@ export class WeatherBlockComponent implements OnInit {
   updateWeatherData(typeOfCall) {
     let url: string;
     // tslint:disable-next-line:triple-equals
-    url = `${environment.serviceUrl}${typeOfCall}?lat=${this.citiesList.get(this.currentCity)[0]}&lon=${this.citiesList.get(this.currentCity)[1]}&appid=${environment.apiKey}&units=metric`;
+    url = `${environment.serviceUrl}${typeOfCall}?lat=${this.citiesMap.get(this.currentCity)[0]}&lon=${this.citiesMap.get(this.currentCity)[1]}&appid=${environment.apiKey}&units=metric`;
     fetch(url)
       .then(response => response.json())
       .then(data => {

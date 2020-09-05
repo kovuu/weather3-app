@@ -9,7 +9,7 @@
 
   <h2>Choose a city</h2>
   <div class="mt-2" >
-  <span *ngFor="let city of citiesList | keyvalue">
+  <span *ngFor="let city of citiesMap | keyvalue">
     <button class="btn btn-outline-primary m-2" (click)="changeCity(city.key)" [ngClass]="{'btn-enabled': currentCity === city.key}">{{city.key}}</button>
   </span>
   </div>
