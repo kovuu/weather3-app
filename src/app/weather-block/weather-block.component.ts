@@ -1,8 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {environment} from '../../environments/environment';
 
 enum ForecastMode {
-    ONE_DAY= 25, THREE_DAYS = 24, WEEK= 7
+    ONE_DAY= 25, THREE_DAYS = 24, WEEK= 7, CURRENT= 1
 }
 
 @Component({
@@ -11,7 +11,6 @@ enum ForecastMode {
   styleUrls: ['./weather-block.component.css']
 })
 export class WeatherBlockComponent implements OnInit {
-
   private WeatherData: any;
   CurrentWeatherData;
   OutputWeatherData = [];
@@ -21,16 +20,23 @@ export class WeatherBlockComponent implements OnInit {
   // tslint:disable-next-line:typedef
   ForecastMode = ForecastMode;
   cityIsChanged = false;
+  typeOfCallsMap = new Map();
 
-
-  constructor() {
-
-  }
+  constructor() {}
 
   ngOnInit(): void {
     this.WeatherData = {
       flag: true,
     };
+    this.CurrentWeatherData = {
+
+    };
+
+    this.typeOfCallsMap.set(this.ForecastMode.ONE_DAY, environment.oneCallApi);
+    this.typeOfCallsMap.set(this.ForecastMode.THREE_DAYS, environment.forecastApi);
+    this.typeOfCallsMap.set(this.ForecastMode.WEEK, environment.oneCallApi);
+    this.typeOfCallsMap.set(this.ForecastMode.CURRENT, environment.currentWeatherApi);
+
     this.citiesList.set('Krasnodar', environment.KRASNODAR);
     this.citiesList.set('Taganrog', environment.TAGANROG);
     this.citiesList.set('Murmansk', environment.MURMANSK);
@@ -39,38 +45,35 @@ export class WeatherBlockComponent implements OnInit {
     this.citiesList.set('Madrid', environment.MADRID);
     this.citiesList.set('Moscow', environment.MOSCOW);
     this.currentCity = 'Taganrog';
-    this.getCurrentWeather();
+    this.updateWeatherData(this.typeOfCallsMap.get(this.ForecastMode.CURRENT));
     this.getForecastForMode(this.forecastMode);
   }
   // tslint:disable-next-line:typedef
-  getWeatherData() {
+  updateWeatherData(typeOfCall) {
     let url: string;
     // tslint:disable-next-line:triple-equals
-    const typeOfCall = this.forecastMode === ForecastMode.THREE_DAYS ? environment.forecastApi : environment.oneCallApi;
     url = `${environment.serviceUrl}${typeOfCall}?lat=${this.citiesList.get(this.currentCity)[0]}&lon=${this.citiesList.get(this.currentCity)[1]}&appid=${environment.apiKey}&units=metric`;
     fetch(url)
       .then(response => response.json())
-      .then(data => this.setWeatherData(data))
-      .then(() => this.getForecast(this.forecastMode));
+      .then(data => {
+        if (typeOfCall === environment.currentWeatherApi) {
+          this.setCurrentWeatherData(data);
+        } else {
+          this.setWeatherData(data);
+        }
+      })
+      .then(() => {
+        if (typeOfCall !== environment.currentWeatherApi) {
+          this.getForecast(this.forecastMode);
+        }
+      }).catch((err) => console.log(err.message));
   }
 
-  getCurrentWeather() {
-    let url = `${environment.serviceUrl}${environment.currentWeatherApi}?lat=${this.citiesList.get(this.currentCity)[0]}&lon=${this.citiesList.get(this.currentCity)[1]}&appid=${environment.apiKey}&units=metric`;
-    fetch(url)
-      .then(response => response.json())
-      .then(data => this.setCurrentWeatherData(data));
-  }
 
+  // tslint:disable-next-line:typedef
   setCurrentWeatherData(data) {
-    this.CurrentWeatherData = {};
-    this.CurrentWeatherData = {
-      temp: data.main.temp.toFixed(0),
-      weather: data.weather[0].main,
-      icon: data.weather[0].icon,
-      date: Date.now(),
-      city: data.name,
-    };
-}
+    Object.assign(this.CurrentWeatherData, this.constructWeatherObject(data, false, true));
+  }
 
 
   // tslint:disable-next-line:typedef
@@ -78,42 +81,6 @@ export class WeatherBlockComponent implements OnInit {
     this.WeatherData = data;
 
   }
-  // tslint:disable-next-line:typedef
-  getDailyForecast(days) {
-    this.OutputWeatherData.length = 0;
-    let count = 0;
-    for (const day of  this.WeatherData.daily) {
-      const obj = {
-        temp: day.temp.day.toFixed(0),
-        date: day.dt * 1000,
-        icon: day.weather[0].icon,
-        weather: day.weather[0].main,
-      };
-
-      this.OutputWeatherData.push(obj);
-      count++;
-      if (count === days) { break; }
-    }
-  }
-  // tslint:disable-next-line:typedef
-  getHourlyForecast() {
-    this.OutputWeatherData.length = 0;
-    let count = 0;
-    for (const day of  this.WeatherData.hourly) {
-      const obj = {
-        temp: day.temp.toFixed(0),
-        date: day.dt * 1000,
-        icon: day.weather[0].icon,
-        weather: day.weather[0].main,
-      };
-      if (count === 0 || count % 3 === 0) {
-        this.OutputWeatherData.push(obj);
-      }
-      count++;
-      if (count === 25) { break; }
-    }
-  }
-
 
   // tslint:disable-next-line:typedef
   getForecast(type) {
@@ -124,42 +91,49 @@ export class WeatherBlockComponent implements OnInit {
     // tslint:disable-next-line:max-line-length
     const currWeatherData = hourly ? this.WeatherData.hourly : this.forecastMode === ForecastMode.WEEK
                   ? this.WeatherData.daily : this.WeatherData.list;
-    let temp;
-    // tslint:disable-next-line:variable-name
-    let tempNight;
     for (const day of  currWeatherData) {
-      temp = hourly ? day.temp.toFixed(0) : this.forecastMode === ForecastMode.WEEK
-                                ? day.temp.day.toFixed(0) : day.main.temp.toFixed(0);
-      tempNight = this.forecastMode === ForecastMode.WEEK ? day.temp.night.toFixed(0) : null;
-      const obj = {
-        temp,
-        tempNight,
-        date: day.dt * 1000,
-        icon: day.weather[0].icon,
-        weather: day.weather[0].main,
-      };
       if (!hourly || (hourly && (count === 0 || count % 3 === 0))) {
-        this.OutputWeatherData.push(obj);
+        this.OutputWeatherData.push(this.constructWeatherObject(day , hourly, false));
       }
       count++;
       if (count === endOfCount) { break; }
 
     }
   }
+
+  // tslint:disable-next-line:typedef
+  constructWeatherObject(data, hourly , currentWeather = false) {
+
+    let temp: number;
+    let tempNight: number = null;
+    if (hourly) {
+        temp = data.temp;
+      } else if (currentWeather || this.forecastMode === ForecastMode.THREE_DAYS) {
+      temp = data.main.temp;
+    }  else  {
+      temp = data.temp.day;
+      tempNight = data.temp.night.toFixed(0);
+    }
+    return {
+      temp: temp.toFixed(0),
+      tempNight,
+      date: data.dt * 1000,
+      icon: data.weather[0].icon,
+      weather: data.weather[0].main,
+      city: data.name
+    };
+  }
+
   // tslint:disable-next-line:typedef
   changeCity(city) {
     this.currentCity = city;
     this.cityIsChanged = true;
-    this.getCurrentWeather();
-    this.getForecastForMode(this.forecastMode);
+    this.updateWeatherData(this.typeOfCallsMap.get(this.ForecastMode.CURRENT));
     this.cityIsChanged = false;
-
+    this.getForecastForMode(this.forecastMode);
   }
 
-  // tslint:disable-next-line:typedef
-  getCurrentCity() {
-    return this.currentCity;
-}
+
 
   // tslint:disable-next-line:typedef
   isDay(time) {
@@ -171,7 +145,7 @@ export class WeatherBlockComponent implements OnInit {
   getForecastForMode(mode) {
     this.forecastMode = mode;
     // tslint:disable-next-line:max-line-length
-    this.getWeatherData();
+    this.updateWeatherData(this.typeOfCallsMap.get(this.forecastMode));
   }
 }
 
