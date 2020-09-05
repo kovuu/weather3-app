@@ -34,12 +34,15 @@
            }">
         <p>
           <span *ngIf="forecastMode === ForecastMode.ONE_DAY">{{day.date | date:'H:mm'}}</span>
-          <span *ngIf="forecastMode === ForecastMode.THREE_DAYS || forecastMode === ForecastMode.WEEK">{{day.date | date:'dd.MM HH:mm'}}</span>
+          <span *ngIf="forecastMode === ForecastMode.THREE_DAYS">{{day.date | date:'dd.MM HH:mm'}}</span>
+          <span *ngIf="forecastMode === ForecastMode.WEEK ">{{day.date | date:'dd.MM'}}</span>
 
         </p>
         <p></p>
           <img src="http://openweathermap.org/img/wn/{{day.icon}}@2x.png">
-        <p>{{day.temp}}℃<span *ngIf="day.tempNight !== null"> / {{day.tempNight}}℃</span></p>
+          <p *ngIf="forecastMode === ForecastMode.WEEK">Day: {{day.temp}}℃</p>
+          <p *ngIf="forecastMode === ForecastMode.WEEK">Night: {{day.tempNight}}℃</p>
+        <p *ngIf="forecastMode !== ForecastMode.WEEK">{{day.temp}}℃<span *ngIf="day.tempNight !== null"> / {{day.tempNight}}℃</span></p>
           <p>{{day.weather}}</p>
         </div>
     </div>

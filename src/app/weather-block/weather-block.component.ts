@@ -19,7 +19,6 @@ export class WeatherBlockComponent implements OnInit {
   forecastMode: ForecastMode = ForecastMode.ONE_DAY;
   // tslint:disable-next-line:typedef
   ForecastMode = ForecastMode;
-  cityIsChanged = false;
   typeOfCallsMap = new Map();
 
   constructor() {}
@@ -127,12 +126,9 @@ export class WeatherBlockComponent implements OnInit {
   // tslint:disable-next-line:typedef
   changeCity(city) {
     this.currentCity = city;
-    this.cityIsChanged = true;
     this.updateWeatherData(this.typeOfCallsMap.get(this.ForecastMode.CURRENT));
-    this.cityIsChanged = false;
     this.getForecastForMode(this.forecastMode);
   }
-
 
 
   // tslint:disable-next-line:typedef
