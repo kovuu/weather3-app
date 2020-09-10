@@ -33,35 +33,20 @@ export class WeatherService {
   }
 
 
-  generateOutputData(city, type): any {
-    return this.getWeatherData(city, type).subscribe(data => {
-      const forecastData: Forecast[] = [];
-      let count = 0;
-      const endOfCount = type;
-      const hourly = type === TypeOfCall.DAILY;
-      const currWeatherData = hourly ? data.hourly : type === TypeOfCall.WEEKLY
-        ? data.daily : data.list;
-      for (const day of  currWeatherData) {
-        if (!hourly || (hourly && (count === 0 || count % 3 === 0))) {
-          forecastData.push(this.generateForecastObj(day , hourly, type));
-        }
-        count++;
-        if (count === endOfCount) { break; }
-      }
-      return forecastData;
-    });
 
-  }
-  generateOutputDataq(city, type): any {
+
+
+  generateOutputData(city, type): any {
     return this.getWeatherData(city, type).pipe(map(data => {
       const forecastData: Forecast[] = [];
       let count = 0;
       const endOfCount = type;
       const hourly = type === TypeOfCall.DAILY;
       const currWeatherData = hourly ? data.hourly : type === TypeOfCall.WEEKLY
-        ? data.daily : data.list;
+        ? data.daily
+        : data.list;
       for (const day of  currWeatherData) {
-        if (!hourly || (hourly && (count === 0 || count % 3 === 0))) {
+        if (!hourly || (hourly && (!count || !(count % 3)))) {
           forecastData.push(this.generateForecastObj(day , hourly, type));
         }
         count++;
@@ -76,6 +61,7 @@ export class WeatherService {
   generateForecastObj(data, hourly, type): Forecast {
     let temp: number;
     let nightTemp: number = null;
+
     if (hourly) {
       temp = data.temp;
     } else if (type === TypeOfCall.THREE_DAYS) {
@@ -84,6 +70,7 @@ export class WeatherService {
       temp = data.temp.day;
       nightTemp = data.temp.night.toFixed(0);
     }
+
     return {
       nightTemp,
       temp: +temp.toFixed(0),

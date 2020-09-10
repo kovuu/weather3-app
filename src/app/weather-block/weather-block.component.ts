@@ -13,8 +13,8 @@ import {log} from "util";
 const DEFAULT_CITY = 'taganrog';
 
 const m = {
-  'daily': TypeOfCall.DAILY,
-  'weekly': TypeOfCall.WEEKLY,
+  daily: TypeOfCall.DAILY,
+  weekly: TypeOfCall.WEEKLY,
   'three-days': TypeOfCall.THREE_DAYS
 };
 
@@ -33,7 +33,6 @@ export class WeatherBlockComponent implements OnInit, OnDestroy {
   typeOfCall: TypeOfCall;
   typeOfCallMap = TypeOfCall;
   forecastMode: string;
-  sub: Subscription;
   forecast: Forecast[] = [];
 
   isLoading = true;
@@ -46,12 +45,9 @@ export class WeatherBlockComponent implements OnInit, OnDestroy {
 
   constructor(private weatherService: WeatherService,
               private cityService: CommunicationService,
-              private route: ActivatedRoute) {
-
-  }
+              private route: ActivatedRoute) {}
 
   ngOnInit(): void {
-
     this.route
         .params
         .pipe(
@@ -67,7 +63,7 @@ export class WeatherBlockComponent implements OnInit, OnDestroy {
           }),
           map(({ city, mode }) => ({
             currentWeather: this.weatherService.getWeatherObject(cities[this.currentCity.toUpperCase()], TypeOfCall.CURRENT),
-            forecast: this.weatherService.generateOutputDataq(cities[this.currentCity.toUpperCase()], this.typeOfCall)
+            forecast: this.weatherService.generateOutputData(cities[this.currentCity.toUpperCase()], this.typeOfCall)
           })),
           takeUntil(this._destroy$)
         )
@@ -78,62 +74,10 @@ export class WeatherBlockComponent implements OnInit, OnDestroy {
           forecast.subscribe(data => this.forecast = data);
           this.isLoading = false;
         });
-
   }
 
   ngOnDestroy(): void {
     this._destroy$.next();
     this._destroy$.complete();
   }
-
-  generateOutputData(data): any {
-    const forecastData: Forecast[] = [];
-    this.forecast.length = 0;
-    let count = 0;
-    const endOfCount = this.typeOfCall;
-    const hourly = this.typeOfCall === TypeOfCall.DAILY;
-    const currWeatherData = hourly ? data.hourly : this.typeOfCall === TypeOfCall.WEEKLY
-      ? data.daily : data.list;
-    for (const day of  currWeatherData) {
-      if (!hourly || (hourly && (count === 0 || count % 3 === 0))) {
-        forecastData.push(this.generateForecastObj(day , hourly));
-      }
-      count++;
-      if (count === endOfCount) { break; }
-    }
-    return forecastData;
-  }
-
-  generateForecastObj(data, hourly): Forecast {
-    let temp: number;
-    let nightTemp: number = null;
-    if (hourly) {
-      temp = data.temp;
-    } else if (this.typeOfCall === TypeOfCall.THREE_DAYS) {
-      temp = data.main.temp;
-    }  else  {
-      temp = data.temp.day;
-      nightTemp = data.temp.night.toFixed(0);
-    }
-    return {
-      nightTemp,
-      temp: +temp.toFixed(0),
-      date: data.dt * 1000,
-      icon: data.weather[0].icon,
-      weather: data.weather[0].main,
-      city: data.name
-    };
-  }
-
-
-
-
-  // tslint:disable-next-line:typedef
-
-/*
-  isDay(time): boolean {
-    return (time < 18 && time > 5);
-  }*/
-
 }
-
