@@ -1,120 +1,123 @@
-import {Component, OnInit} from '@angular/core';
-import {environment} from '../../environments/environment';
+import {Component, OnDestroy, OnInit, Output} from '@angular/core';
+import {WeatherService} from "../weather.service";
+import {Weather} from "../weather";
+import {TypeOfCall} from "../../enums/typeOfCall";
+import {cities} from "../../const/cities";
+import {ActivatedRoute} from "@angular/router";
+import {CommunicationService} from "../communication.service";
+import {forkJoin, Subject, Subscription} from "rxjs";
+import {finalize, map, switchMap, takeUntil, tap} from "rxjs/operators";
+import {Forecast} from "../forecast";
+import {log} from "util";
 
-enum ForecastMode {
-    ONE_DAY= 25, THREE_DAYS = 24, WEEK= 7, CURRENT= 1
-}
+const DEFAULT_CITY = 'taganrog';
+
+const m = {
+  'daily': TypeOfCall.DAILY,
+  'weekly': TypeOfCall.WEEKLY,
+  'three-days': TypeOfCall.THREE_DAYS
+};
 
 @Component({
   selector: 'app-weather-block',
   templateUrl: './weather-block.component.html',
-  styleUrls: ['./weather-block.component.css']
+  styleUrls: ['./weather-block.component.css'],
+  providers: [CommunicationService]
 })
-export class WeatherBlockComponent implements OnInit {
-  private WeatherData: any;
-  CurrentWeatherData: any;
-  OutputWeatherData: any = [];
-  currentCity: string ;
-  citiesMap = new Map();
-  forecastMode: ForecastMode = ForecastMode.ONE_DAY;
-  ForecastMode: any = ForecastMode;
-  private typeOfCallsMap = new Map();
+export class WeatherBlockComponent implements OnInit, OnDestroy {
+  private _destroy$ = new Subject();
 
-  constructor() {}
+  currentWeather: Weather;
+  currentCity: string;
+  citiesMap = new Map();
+  typeOfCall: TypeOfCall;
+  typeOfCallMap = TypeOfCall;
+  forecastMode: string;
+  sub: Subscription;
+  forecast: Forecast[] = [];
+
+  isLoading = true;
+
+  get isDay(): boolean {
+    const date = new Date(this.currentWeather.date);
+    const hour = date.getHours();
+    return (hour < 18 && hour > 5);
+  }
+
+  constructor(private weatherService: WeatherService,
+              private cityService: CommunicationService,
+              private route: ActivatedRoute) {
+
+  }
 
   ngOnInit(): void {
-    this.WeatherData = {
-      flag: true,
-    };
-    this.CurrentWeatherData = {
 
-    };
-
-    this.typeOfCallsMap.set(this.ForecastMode.ONE_DAY, environment.oneCallApi);
-    this.typeOfCallsMap.set(this.ForecastMode.THREE_DAYS, environment.forecastApi);
-    this.typeOfCallsMap.set(this.ForecastMode.WEEK, environment.oneCallApi);
-    this.typeOfCallsMap.set(this.ForecastMode.CURRENT, environment.currentWeatherApi);
-
-    this.citiesMap.set('Krasnodar', environment.KRASNODAR);
-    this.citiesMap.set('Taganrog', environment.TAGANROG);
-    this.citiesMap.set('Murmansk', environment.MURMANSK);
-    this.citiesMap.set('Vladivostok', environment.VLADIVOSTOK);
-    this.citiesMap.set('NewYork', environment.NEW_YORK);
-    this.citiesMap.set('Madrid', environment.MADRID);
-    this.citiesMap.set('Moscow', environment.MOSCOW);
-    this.currentCity = 'Taganrog';
-    this.updateWeatherData(this.typeOfCallsMap.get(this.ForecastMode.CURRENT));
-    this.getForecastForMode(this.forecastMode);
-  }
-  // tslint:disable-next-line:typedef
-  updateWeatherData(typeOfCall) {
-    let url: string;
-    // tslint:disable-next-line:triple-equals
-    url = `${environment.serviceUrl}${typeOfCall}?lat=${this.citiesMap.get(this.currentCity)[0]}&lon=${this.citiesMap.get(this.currentCity)[1]}&appid=${environment.apiKey}&units=metric`;
-    fetch(url)
-      .then(response => response.json())
-      .then(data => {
-        if (typeOfCall === environment.currentWeatherApi) {
-          this.setCurrentWeatherData(data);
-        } else {
-          this.setWeatherData(data);
-        }
-      })
-      .then(() => {
-        if (typeOfCall !== environment.currentWeatherApi) {
-          this.getForecast(this.forecastMode);
-        }
-      }).catch((err) => console.log(err.message));
-  }
-
-
-  // tslint:disable-next-line:typedef
-  setCurrentWeatherData(data) {
-    Object.assign(this.CurrentWeatherData, this.constructWeatherObject(data, false, true));
-  }
-
-
-  // tslint:disable-next-line:typedef
-  setWeatherData(data) {
-    this.WeatherData = data;
+    this.route
+        .params
+        .pipe(
+          map(({ city, mode }) => ({
+            mode,
+            city: (city || DEFAULT_CITY).toUpperCase()
+          })),
+          tap(({ city, mode }) => {
+            this.currentCity = city;
+            this.forecastMode = mode;
+            this.typeOfCall = m[mode];
+            this.citiesMap = new Map(Object.entries(cities));
+          }),
+          map(({ city, mode }) => ({
+            currentWeather: this.weatherService.getWeatherObject(cities[this.currentCity.toUpperCase()], TypeOfCall.CURRENT),
+            forecast: this.weatherService.generateOutputDataq(cities[this.currentCity.toUpperCase()], this.typeOfCall)
+          })),
+          takeUntil(this._destroy$)
+        )
+        .subscribe(({ currentWeather, forecast}) =>
+        {
+          this.isLoading = true;
+          currentWeather.subscribe(data => this.currentWeather = data);
+          forecast.subscribe(data => this.forecast = data);
+          this.isLoading = false;
+        });
 
   }
 
-  // tslint:disable-next-line:typedef
-  getForecast(type) {
-    this.OutputWeatherData.length = 0;
+  ngOnDestroy(): void {
+    this._destroy$.next();
+    this._destroy$.complete();
+  }
+
+  generateOutputData(data): any {
+    const forecastData: Forecast[] = [];
+    this.forecast.length = 0;
     let count = 0;
-    const endOfCount = type;
-    const hourly = type === ForecastMode.ONE_DAY;
-    // tslint:disable-next-line:max-line-length
-    const currWeatherData = hourly ? this.WeatherData.hourly : this.forecastMode === ForecastMode.WEEK
-                  ? this.WeatherData.daily : this.WeatherData.list;
+    const endOfCount = this.typeOfCall;
+    const hourly = this.typeOfCall === TypeOfCall.DAILY;
+    const currWeatherData = hourly ? data.hourly : this.typeOfCall === TypeOfCall.WEEKLY
+      ? data.daily : data.list;
     for (const day of  currWeatherData) {
       if (!hourly || (hourly && (count === 0 || count % 3 === 0))) {
-        this.OutputWeatherData.push(this.constructWeatherObject(day , hourly, false));
+        forecastData.push(this.generateForecastObj(day , hourly));
       }
       count++;
       if (count === endOfCount) { break; }
-
     }
+    return forecastData;
   }
 
-  // tslint:disable-next-line:typedef
-  constructWeatherObject(data, hourly , currentWeather = false) {
-
+  generateForecastObj(data, hourly): Forecast {
     let temp: number;
-    let tempNight: number = null;
+    let nightTemp: number = null;
     if (hourly) {
-        temp = data.temp;
-      } else if (currentWeather || this.forecastMode === ForecastMode.THREE_DAYS) {
+      temp = data.temp;
+    } else if (this.typeOfCall === TypeOfCall.THREE_DAYS) {
       temp = data.main.temp;
     }  else  {
       temp = data.temp.day;
-      tempNight = data.temp.night.toFixed(0);
+      nightTemp = data.temp.night.toFixed(0);
     }
     return {
-      temp: temp.toFixed(0),
-      tempNight,
+      nightTemp,
+      temp: +temp.toFixed(0),
       date: data.dt * 1000,
       icon: data.weather[0].icon,
       weather: data.weather[0].main,
@@ -122,25 +125,15 @@ export class WeatherBlockComponent implements OnInit {
     };
   }
 
-  // tslint:disable-next-line:typedef
-  changeCity(city) {
-    this.currentCity = city;
-    this.updateWeatherData(this.typeOfCallsMap.get(this.ForecastMode.CURRENT));
-    this.getForecastForMode(this.forecastMode);
-  }
+
 
 
   // tslint:disable-next-line:typedef
-  isDay(time) {
+
+/*
+  isDay(time): boolean {
     return (time < 18 && time > 5);
-  }
+  }*/
 
-
-  // tslint:disable-next-line:typedef
-  getForecastForMode(mode) {
-    this.forecastMode = mode;
-    // tslint:disable-next-line:max-line-length
-    this.updateWeatherData(this.typeOfCallsMap.get(this.forecastMode));
-  }
 }
 

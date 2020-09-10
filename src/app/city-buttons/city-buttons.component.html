@@ -1,0 +1,8 @@
+<h2>Choose a city</h2>
+<div class="mt-2" >
+  <span *ngFor="let city of citiesMap | keyvalue" >
+   <button  routerLink="/{{forecastMode}}/{{city.key | lowercase}}" class="btn btn-outline-primary m-2"  [ngClass]="{'btn-enabled': currentCity  === city.key}">{{city.key | titlecase}}</button>
+  </span>
+</div>
+
+

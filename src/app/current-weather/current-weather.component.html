@@ -1,0 +1,12 @@
+<h2>Current Weather</h2>
+<div class="first-block" [ngClass]="{
+            'night': !isDay,
+             'day': isDay
+      }">
+  <img src="http://openweathermap.org/img/wn/{{currentWeather.icon}}@2x.png">
+  <p class="temp">{{currentWeather.temp}}℃</p>
+  <p class="weather">{{currentWeather.weather}}</p>
+  <p class="time">{{currentWeather.date | date:'H:mm'}}</p>
+  <p class="city">{{currentWeather.city}}</p>
+  <p class="date">{{currentWeather.date | date: 'dd MMMM' }}</p>
+</div>

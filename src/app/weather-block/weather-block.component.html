@@ -1,51 +1,16 @@
-<div class="container">
+<div class="container" *ngIf="!isLoading">
   <h1>Weather-App!</h1>
-  <div class="mt-4" >
-    <h2>Choose a forecast</h2>
-    <button class="btn btn-outline-primary m-2" (click)="getForecastForMode(ForecastMode.ONE_DAY)" [ngClass]="{'btn-enabled': forecastMode === ForecastMode.ONE_DAY}">One Day</button>
-    <button class="btn btn-outline-primary m-2" (click)="getForecastForMode(ForecastMode.THREE_DAYS)" [ngClass]="{'btn-enabled': forecastMode === ForecastMode.THREE_DAYS}">Three days</button>
-    <button class="btn btn-outline-primary m-2" (click)="getForecastForMode(ForecastMode.WEEK)" [ngClass]="{'btn-enabled': forecastMode === ForecastMode.WEEK}">Week</button>
-  </div>
+  <app-forecast-mode [currentCity]="currentCity" [typeOfCall]="typeOfCall" [typeOfCallMap]="typeOfCallMap" ></app-forecast-mode>
+  <app-city-buttons [forecastMode]="forecastMode" [citiesMap]="citiesMap" [currentCity]="currentCity"></app-city-buttons>
 
-  <h2>Choose a city</h2>
-  <div class="mt-2" >
-  <span *ngFor="let city of citiesMap | keyvalue">
-    <button class="btn btn-outline-primary m-2" (click)="changeCity(city.key)" [ngClass]="{'btn-enabled': currentCity === city.key}">{{city.key}}</button>
-  </span>
-  </div>
 
-  <h2>Current Weather</h2>
-  <div class="first-block" [ngClass]="{
-              night: !isDay(CurrentWeatherData.date | date:'H'),
-              day: isDay(CurrentWeatherData.date | date:'H')
-           }">
-    <img src="http://openweathermap.org/img/wn/{{CurrentWeatherData.icon}}@2x.png">
-    <p class="temp">{{CurrentWeatherData.temp}}℃</p>
-    <p class="weather">{{CurrentWeatherData.weather}}</p>
-    <p class="time">{{CurrentWeatherData.date | date:'H:mm'}}</p>
-    <p class="city">{{CurrentWeatherData.city}}</p>
-    <p class="date">{{CurrentWeatherData.date | date: 'dd MMMM' }}</p>
-  </div>
+  <app-current-weather [currentWeather]="currentWeather" [isDay]="isDay"></app-current-weather>
+
+
   <h2>Forecast</h2>
-    <div class="mt-4 d-flex align-content-stretch justify-content-center flex-wrap wrap" >
-      <div class="p-2  h-auto weather-block " *ngFor="let day of OutputWeatherData" [ngClass]="{
-              night: !isDay(day.date | date:'H'),
-              day: isDay(day.date | date:'H')
-           }">
-        <p>
-          <span *ngIf="forecastMode === ForecastMode.ONE_DAY">{{day.date | date:'H:mm'}}</span>
-          <span *ngIf="forecastMode === ForecastMode.THREE_DAYS">{{day.date | date:'dd.MM HH:mm'}}</span>
-          <span *ngIf="forecastMode === ForecastMode.WEEK ">{{day.date | date:'dd.MM'}}</span>
 
-        </p>
-        <p></p>
-          <img src="http://openweathermap.org/img/wn/{{day.icon}}@2x.png">
-          <p *ngIf="forecastMode === ForecastMode.WEEK">Day: {{day.temp}}℃</p>
-          <p *ngIf="forecastMode === ForecastMode.WEEK">Night: {{day.tempNight}}℃</p>
-        <p *ngIf="forecastMode !== ForecastMode.WEEK">{{day.temp}}℃<span *ngIf="day.tempNight !== null"> / {{day.tempNight}}℃</span></p>
-          <p>{{day.weather}}</p>
-        </div>
-    </div>
+  <app-forecast [typeOfCall]="typeOfCall" [isDay]="isDay" [forecastOutputData]="forecast" [TypeOfCallEnum]="typeOfCallMap" ></app-forecast>
+
 
 
 

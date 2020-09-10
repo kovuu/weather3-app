@@ -1,0 +1,19 @@
+<div class="mt-4 d-flex align-content-stretch justify-content-center flex-wrap wrap" >
+  <div class="p-2  h-auto weather-block " *ngFor="let day of forecastOutputData" [ngClass]="{
+              night: !isDay,
+              day: isDay
+           }">
+    <p>
+      <span *ngIf="typeOfCall === TypeOfCallEnum.DAILY">{{day.date | date:'H:mm'}}</span>
+      <span *ngIf="typeOfCall === TypeOfCallEnum.THREE_DAYS">{{day.date | date:'dd.MM HH:mm'}}</span>
+      <span *ngIf="typeOfCall === TypeOfCallEnum.WEEKLY ">{{day.date | date:'dd.MM'}}</span>
+
+    </p>
+    <p></p>
+    <img src="http://openweathermap.org/img/wn/{{day.icon}}@2x.png">
+    <p *ngIf="typeOfCall === TypeOfCallEnum.WEEKLY">Day: {{day.temp}}℃</p>
+    <p *ngIf="typeOfCall === TypeOfCallEnum.WEEKLY">Night: {{day.nightTemp}}℃</p>
+    <p *ngIf="typeOfCall !== TypeOfCallEnum.WEEKLY">{{day.temp}}℃<span *ngIf="day.nightTemp !== null"> / {{day.nightTemp}}℃</span></p>
+    <p>{{day.weather}}</p>
+  </div>
+</div>

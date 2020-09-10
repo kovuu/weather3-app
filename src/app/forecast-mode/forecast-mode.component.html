@@ -1,0 +1,6 @@
+<div class="mt-4" >
+  <h2>Choose a forecast</h2>
+  <button class="btn btn-outline-primary m-2" routerLink="/daily/{{currentCity | lowercase}}"   [ngClass]="{'btn-enabled': typeOfCall === typeOfCallMap.DAILY}">One Day</button>
+  <button class="btn btn-outline-primary m-2" routerLink="/three-days/{{currentCity | lowercase}}"  [ngClass]="{'btn-enabled': typeOfCall === typeOfCallMap.THREE_DAYS}">Three days</button>
+  <button class="btn btn-outline-primary m-2" routerLink="/weekly/{{currentCity | lowercase}}"  [ngClass]="{'btn-enabled': typeOfCall === typeOfCallMap.WEEKLY}">Week</button>
+</div>
