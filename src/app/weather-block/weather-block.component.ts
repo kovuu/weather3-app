@@ -4,7 +4,6 @@ import {Weather} from '../entities/weather';
 import {TypeOfCall} from '../../enums/typeOfCall';
 import {cities} from '../../const/cities';
 import {ActivatedRoute} from '@angular/router';
-import {CommunicationService} from '../services/communication.service';
 import { Subject} from 'rxjs';
 import {map, takeUntil, tap} from 'rxjs/operators';
 import {Forecast} from '../entities/forecast';
@@ -21,7 +20,6 @@ const m = {
   selector: 'app-weather-block',
   templateUrl: './weather-block.component.html',
   styleUrls: ['./weather-block.component.css'],
-  providers: [CommunicationService]
 })
 export class WeatherBlockComponent implements OnInit, OnDestroy {
   private _destroy$ = new Subject();
@@ -43,7 +41,6 @@ export class WeatherBlockComponent implements OnInit, OnDestroy {
   }
 
   constructor(private weatherService: WeatherService,
-              private cityService: CommunicationService,
               private route: ActivatedRoute) {}
 
   ngOnInit(): void {
@@ -70,7 +67,7 @@ export class WeatherBlockComponent implements OnInit, OnDestroy {
         {
           currentWeather.subscribe(data => this.currentWeather = data);
           forecast.subscribe(data => {
-            this.forecast = data
+            this.forecast = data;
             this.isLoading = false;
           });
         });
