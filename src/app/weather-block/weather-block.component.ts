@@ -1,14 +1,13 @@
 import {Component, OnDestroy, OnInit, Output} from '@angular/core';
-import {WeatherService} from "../weather.service";
-import {Weather} from "../weather";
-import {TypeOfCall} from "../../enums/typeOfCall";
-import {cities} from "../../const/cities";
-import {ActivatedRoute} from "@angular/router";
-import {CommunicationService} from "../communication.service";
-import {forkJoin, Subject, Subscription} from "rxjs";
-import {finalize, map, switchMap, takeUntil, tap} from "rxjs/operators";
-import {Forecast} from "../forecast";
-import {log} from "util";
+import {WeatherService} from '../services/weather.service';
+import {Weather} from '../entities/weather';
+import {TypeOfCall} from '../../enums/typeOfCall';
+import {cities} from '../../const/cities';
+import {ActivatedRoute} from '@angular/router';
+import {CommunicationService} from '../services/communication.service';
+import { Subject} from 'rxjs';
+import {map, takeUntil, tap} from 'rxjs/operators';
+import {Forecast} from '../entities/forecast';
 
 const DEFAULT_CITY = 'taganrog';
 
@@ -62,17 +61,18 @@ export class WeatherBlockComponent implements OnInit, OnDestroy {
             this.citiesMap = new Map(Object.entries(cities));
           }),
           map(({ city, mode }) => ({
-            currentWeather: this.weatherService.getWeatherObject(cities[this.currentCity.toUpperCase()], TypeOfCall.CURRENT),
-            forecast: this.weatherService.generateOutputData(cities[this.currentCity.toUpperCase()], this.typeOfCall)
+            currentWeather: this.weatherService.getCurrentWeather(cities[this.currentCity.toUpperCase()], TypeOfCall.CURRENT),
+            forecast: this.weatherService.getForecast(cities[this.currentCity.toUpperCase()], this.typeOfCall)
           })),
           takeUntil(this._destroy$)
         )
         .subscribe(({ currentWeather, forecast}) =>
         {
-          this.isLoading = true;
           currentWeather.subscribe(data => this.currentWeather = data);
-          forecast.subscribe(data => this.forecast = data);
-          this.isLoading = false;
+          forecast.subscribe(data => {
+            this.forecast = data
+            this.isLoading = false;
+          });
         });
   }
 

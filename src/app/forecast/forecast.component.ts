@@ -1,10 +1,5 @@
 import {ChangeDetectionStrategy, Component, Input, OnInit} from '@angular/core';
-import {Forecast} from "../forecast";
-import {TypeOfCall} from "../../enums/typeOfCall";
-import {ActivatedRoute} from "@angular/router";
-import {WeatherService} from "../weather.service";
-import {CommunicationService} from "../communication.service";
-import {cities} from "../../const/cities";
+import {TypeOfCall} from '../../enums/typeOfCall';
 
 @Component({
   selector: 'app-forecast',

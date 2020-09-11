@@ -19,6 +19,6 @@ export class ParamInterceptor implements HttpInterceptor{
           window.alert(errorMessage);
           return throwError(errorMessage);
         })
-      )
+      );
   }
 }

@@ -1,15 +1,15 @@
 import {Injectable} from '@angular/core';
-import {HttpClient} from "@angular/common/http";
-import {Observable, Subscription} from "rxjs";
-
-import {connect} from "../const/connect";
-import {TypeOfCall} from "../enums/typeOfCall";
-import {Forecast} from "./forecast";
-import {Weather} from "./weather";
-import {map} from "rxjs/operators";
+import {HttpClient} from '@angular/common/http';
+import {Observable} from 'rxjs';
+import {connect} from '../../const/connect';
+import {TypeOfCall} from '../../enums/typeOfCall';
+import {Forecast} from '../entities/forecast';
+import {Weather} from '../entities/weather';
+import {map} from 'rxjs/operators';
+import {Predicatable} from './utilites /predicatable.utility';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class WeatherService {
 
@@ -18,7 +18,6 @@ export class WeatherService {
     const url = this.generateUrl(city, type);
     return this.http.get(url);
   }
-
 
   generateUrl(city, type: TypeOfCall): string {
     switch (type) {
@@ -32,31 +31,25 @@ export class WeatherService {
     }
   }
 
-
-
-
-
-  generateOutputData(city, type): any {
+  getForecast(city, type): Observable<Forecast[]> {
     return this.getWeatherData(city, type).pipe(map(data => {
       const forecastData: Forecast[] = [];
-      let count = 0;
-      const endOfCount = type;
-      const hourly = type === TypeOfCall.DAILY;
-      const currWeatherData = hourly ? data.hourly : type === TypeOfCall.WEEKLY
+      let passedItems = 0;
+      const numOfReqElements = type;
+      const isHourlyForecast = type === TypeOfCall.DAILY;
+      const currWeatherData = isHourlyForecast ? data.hourly : type === TypeOfCall.WEEKLY
         ? data.daily
         : data.list;
       for (const day of  currWeatherData) {
-        if (!hourly || (hourly && (!count || !(count % 3)))) {
-          forecastData.push(this.generateForecastObj(day , hourly, type));
+        if (Predicatable.needToPush(isHourlyForecast, passedItems)) {
+          forecastData.push(this.generateForecastObj(day , isHourlyForecast, type));
         }
-        count++;
-        if (count === endOfCount) { break; }
+        passedItems++;
+        if (passedItems === numOfReqElements) { break; }
       }
       return forecastData;
     }));
-
   }
-
 
   generateForecastObj(data, hourly, type): Forecast {
     let temp: number;
@@ -81,20 +74,17 @@ export class WeatherService {
     };
   }
 
-  getWeatherObject(city, type): Observable<any> {
+  getCurrentWeather(city, type): Observable<Weather> {
     return this.getWeatherData(city, type).pipe(
       map(data => {
         return {
           temp: data.main.temp.toFixed(0),
-          date: data.dt,
+          date: data.dt * 1000,
           icon: data.weather[0].icon,
           weather: data.weather[0].main,
           city: data.name
         };
       })
     );
-
   }
-
-
 }

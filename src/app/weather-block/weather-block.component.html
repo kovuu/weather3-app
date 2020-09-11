@@ -7,7 +7,7 @@
   <app-current-weather [currentWeather]="currentWeather" [isDay]="isDay"></app-current-weather>
 
 
-
+ {{currentWeather.date | date: 'short'}}
 
   <app-forecast [typeOfCall]="typeOfCall" [isDay]="isDay" [forecastOutputData]="forecast" [TypeOfCallEnum]="typeOfCallMap" ></app-forecast>
 
