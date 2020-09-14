@@ -1,4 +1,4 @@
-import {Component, Input} from '@angular/core';
+import {Component, Input, OnInit} from '@angular/core';
 import {Weather} from '../entities/weather';
 
 @Component({
@@ -6,7 +6,7 @@ import {Weather} from '../entities/weather';
   templateUrl: './current-weather.component.html',
   styleUrls: ['./current-weather.component.css']
 })
-export class CurrentWeatherComponent  {
+export class CurrentWeatherComponent {
 
   @Input()
     currentWeather: Weather;

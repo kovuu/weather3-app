@@ -7,6 +7,7 @@ import {ActivatedRoute} from '@angular/router';
 import { Subject} from 'rxjs';
 import {map, takeUntil, tap} from 'rxjs/operators';
 import {Forecast} from '../entities/forecast';
+import dataJson from '../data.json';
 
 const DEFAULT_CITY = 'taganrog';
 
@@ -67,6 +68,7 @@ export class WeatherBlockComponent implements OnInit, OnDestroy {
         {
           currentWeather.subscribe(data => this.currentWeather = data);
           forecast.subscribe(data => {
+            console.log(data);
             this.forecast = data;
             this.isLoading = false;
           });

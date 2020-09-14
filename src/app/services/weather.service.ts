@@ -16,6 +16,7 @@ export class WeatherService {
   constructor(private http: HttpClient) { }
   getWeatherData(city, type): Observable<any> {
     const url = this.generateUrl(city, type);
+    console.log(url);
     return this.http.get(url);
   }
 
@@ -61,7 +62,7 @@ export class WeatherService {
       temp = data.main.temp;
     }  else  {
       temp = data.temp.day;
-      nightTemp = data.temp.night.toFixed(0);
+      nightTemp = +data.temp.night.toFixed(0);
     }
 
     return {
@@ -78,7 +79,7 @@ export class WeatherService {
     return this.getWeatherData(city, type).pipe(
       map(data => {
         return {
-          temp: data.main.temp.toFixed(0),
+          temp: +data.main.temp.toFixed(0),
           date: data.dt * 1000,
           icon: data.weather[0].icon,
           weather: data.weather[0].main,
@@ -87,4 +88,6 @@ export class WeatherService {
       })
     );
   }
+
+
 }

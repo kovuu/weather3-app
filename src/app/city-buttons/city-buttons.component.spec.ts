@@ -2,6 +2,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { CityButtonsComponent } from './city-buttons.component';
 
+
 describe('CityButtonsComponent', () => {
   let component: CityButtonsComponent;
   let fixture: ComponentFixture<CityButtonsComponent>;
