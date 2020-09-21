@@ -68,7 +68,6 @@ export class WeatherBlockComponent implements OnInit, OnDestroy {
         {
           currentWeather.subscribe(data => this.currentWeather = data);
           forecast.subscribe(data => {
-            console.log(data);
             this.forecast = data;
             this.isLoading = false;
           });

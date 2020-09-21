@@ -6,5 +6,6 @@ export class Predicatable {
     } else if (!passedElements || !(passedElements % 3)) {
       return true;
     }
+    return false;
   }
 }

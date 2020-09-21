@@ -1,8 +1,11 @@
-<div class="container" *ngIf="!isLoading && forecast.length !== 0 && forecastMode && typeOfCall">
+<div class="container">
   <h1>Weather-App!</h1>
-<!--  <app-forecast-mode [currentCity]="currentCity" [typeOfCall]="typeOfCall" [typeOfCallMap]="typeOfCallMap" ></app-forecast-mode>-->
-<!--  <app-city-buttons [forecastMode]="forecastMode" [citiesMap]="citiesMap" [currentCity]="currentCity"></app-city-buttons>-->
-  <app-current-weather [currentWeather]="currentWeather" [isDay]="isDay"></app-current-weather>
-  <app-forecast *ngIf="forecast.length > 0" [typeOfCall]="typeOfCall" [isDay]="isDay" [forecastOutputData]="forecast" [TypeOfCallEnum]="typeOfCallMap" ></app-forecast>
+  <div *ngIf="!isLoading && forecast.length !== 0 && forecastMode && typeOfCall && currentWeather">
+    <app-forecast-mode [currentCity]="currentCity" [typeOfCall]="typeOfCall" [typeOfCallMap]="typeOfCallMap" ></app-forecast-mode>
+    <app-city-buttons [forecastMode]="forecastMode" [citiesMap]="citiesMap" [currentCity]="currentCity"></app-city-buttons>
+    <div *ngIf="currentWeather">
+    <app-current-weather [currentWeather]="currentWeather" [isDay]="isDay"></app-current-weather>
+    </div>
+    <app-forecast *ngIf="forecast.length > 0" [typeOfCall]="typeOfCall"  [forecastOutputData]="forecast" [TypeOfCallEnum]="typeOfCallMap" ></app-forecast>
+  </div>
 </div>
-

@@ -1,4 +1,4 @@
-import {Component, Input, OnInit} from '@angular/core';
+import {Component, Input, OnChanges, OnInit, SimpleChanges} from '@angular/core';
 import {Weather} from '../entities/weather';
 
 @Component({
@@ -6,7 +6,7 @@ import {Weather} from '../entities/weather';
   templateUrl: './current-weather.component.html',
   styleUrls: ['./current-weather.component.css']
 })
-export class CurrentWeatherComponent {
+export class CurrentWeatherComponent implements OnChanges {
 
   @Input()
     currentWeather: Weather;
@@ -14,5 +14,7 @@ export class CurrentWeatherComponent {
     isDay: boolean;
 
 
-
+  ngOnChanges(changes: SimpleChanges): void {
+    this.currentWeather.date = Date.now();
+  }
 }

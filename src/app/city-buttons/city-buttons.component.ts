@@ -1,4 +1,5 @@
 import {Component, Input, OnInit} from '@angular/core';
+import {cities} from "../../const/cities";
 
 @Component({
   selector: 'app-city-buttons',
@@ -13,6 +14,7 @@ export class CityButtonsComponent  {
     forecastMode: string;
   @Input()
     currentCity: string;
+
 
 
 }

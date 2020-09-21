@@ -118,6 +118,7 @@ describe('WeatherService', () => {
     ];
 
 
+
     const testJson = jsonData;
     httpClientSpy.get.and.returnValue(of(testJson));
     weatherService.getForecast(cities.YEKATERINBURG, TypeOfCall.WEEKLY).subscribe(
@@ -125,7 +126,10 @@ describe('WeatherService', () => {
        fail
      );
     expect(httpClientSpy.get.calls.count()).toBe(1, 'one call');
+
+
   });
+
 
   it('should return forecast object', () => {
     const stubObject: Forecast = {

@@ -9,7 +9,7 @@ import { ForecastComponent } from './forecast/forecast.component';
 import { CityButtonsComponent } from './city-buttons/city-buttons.component';
 import { ForecastModeComponent } from './forecast-mode/forecast-mode.component';
 import {WeatherService} from './services/weather.service';
-import {ParamInterceptor} from './interceptors/api.interceptor';
+import {ErrorsInterceptor} from './interceptors/errors.interceptor';
 import { CurrentWeatherComponent } from './current-weather/current-weather.component';
 
 
@@ -30,7 +30,7 @@ import { CurrentWeatherComponent } from './current-weather/current-weather.compo
   providers: [
     WeatherService, {
       provide: HTTP_INTERCEPTORS,
-      useClass: ParamInterceptor,
+      useClass: ErrorsInterceptor,
       multi: true
     }
   ],

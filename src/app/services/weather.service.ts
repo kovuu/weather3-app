@@ -16,7 +16,6 @@ export class WeatherService {
   constructor(private http: HttpClient) { }
   getWeatherData(city, type): Observable<any> {
     const url = this.generateUrl(city, type);
-    console.log(url);
     return this.http.get(url);
   }
 
@@ -88,6 +87,4 @@ export class WeatherService {
       })
     );
   }
-
-
 }

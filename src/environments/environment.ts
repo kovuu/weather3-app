@@ -3,19 +3,6 @@
 // The list of file replacements can be found in `angular.json`.
 
 export const environment = {
-  apiKey: '05b4282be099cfd73e7c86861370e3d8',
-  serviceUrl: 'https://api.openweathermap.org/data/2.5/',
-  oneCallApi: 'onecall',
-  currentWeatherApi: 'weather',
-  forecastApi: 'forecast',
-  KRASNODAR: ['45.0328', '38.9769'],
-  TAGANROG: ['47.2362', '38.8969'],
-  MOSCOW: ['55.7522', '37.6156'],
-  MURMANSK: ['68.9792', '33.0925'],
-  VLADIVOSTOK: ['43.1056', '131.8735'],
-  YEKATERINBURG: ['56.8575', '60.6125'],
-  NEW_YORK: ['40.7143', '-74.006'],
-  MADRID: ['40.4165', '-3.7026'],
   production: false
 };
 
